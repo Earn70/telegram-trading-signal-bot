@@ -2,7 +2,7 @@ from fastapi import FastAPI, Request
 import requests
 
 BOT_TOKEN = "8307016683:AABEZvDQCj-ai8kUgKLFNmDcU6jL_MgOqJ"
-API_URL = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
+API_URL = f"https://api.telegram.org/bot8307016683:AABEZvDQCj-ai8kUgKLFNmDcU6jL_MgOqJ/sendMessage"
 
 app = FastAPI()
 
@@ -16,7 +16,7 @@ async def webhook(request: Request):
     print(data)
     if "message" in data and "text" in data["message"]:
         chat_id = data["message"]["chat"]["id"]
-        text = data["message"]["text"]
-        if text.lower() == "hi":
+        text = data["message"]["text"].lower()
+        if text == "hi":
             requests.post(API_URL, json={"chat_id": chat_id, "text": "Hello 👋 MNTUSDT signal bot is active ✅"})
     return {"ok": True}
