@@ -1,55 +1,22 @@
-import requests
-import threading
-import time
 from fastapi import FastAPI, Request
+import requests
+
+BOT_TOKEN = "8307016683:AABEZvDQCj-ai8kUgKLFNmDcU6jL_MgOqJ"
+API_URL = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
 
 app = FastAPI()
 
-TELEGRAM_TOKEN = "PUT_YOUR_TELEGRAM_TOKEN_HERE"
-CHATGPT_KEY = "PUT_YOUR_OPENAI_KEY_HERE"
-
-CHAT_ID = None
-
-def send_telegram(msg):
-    if CHAT_ID is None:
-        return
-    url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
-    requests.post(url, json={"chat_id": CHAT_ID, "text": msg})
+@app.get("/")
+async def root():
+    return {"message": "Bot is running fine."}
 
 @app.post("/webhook")
 async def webhook(request: Request):
-    global CHAT_ID
     data = await request.json()
-
-    if "message" in data:
-        CHAT_ID = data["message"]["chat"]["id"]
-        user_msg = data["message"]["text"]
-
-        gpt = requests.post(
-            "https://api.openai.com/v1/chat/completions",
-            headers={"Authorization": f"Bearer {CHATGPT_KEY}"},
-            json={
-                "model": "gpt-5",
-                "messages": [
-                    {"role": "system", "content": "You are a trading assistant for MNTUSDT scalping signals."},
-                    {"role": "user", "content": user_msg}
-                ]
-            }
-        ).json()
-
-        reply = gpt["choices"][0]["message"]["content"]
-        send_telegram(reply)
-
+    print(data)
+    if "message" in data and "text" in data["message"]:
+        chat_id = data["message"]["chat"]["id"]
+        text = data["message"]["text"]
+        if text.lower() == "hi":
+            requests.post(API_URL, json={"chat_id": chat_id, "text": "Hello 👋 MNTUSDT signal bot is active ✅"})
     return {"ok": True}
-
-def generate_signal():
-    return "✅ MNTUSDT 5m Scalping Signal\nEntry: 3.64\nTP: 3.71\nSL: 3.58"
-
-def auto_signal_loop():
-    while True:
-        time.sleep(300)  # every 5 minutes
-        signal = generate_signal()
-        send_telegram(signal)
-
-threading.Thread(target=auto_signal_loop, daemon=True).start()
-
