@@ -2,7 +2,7 @@ from fastapi import FastAPI, Request
 import requests
 
 BOT_TOKEN = "8307016683:AABEZvDQCj-ai8kUgKLFNmDcU6jL_MgOqJ"
-API_URL = f"https://api.telegram.org/bot8307016683:AABEZvDQCj-ai8kUgKLFNmDcU6jL_MgOqJ/sendMessage"
+API_URL = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
 
 app = FastAPI()
 
